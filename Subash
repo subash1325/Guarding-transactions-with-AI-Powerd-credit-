@@ -37,3 +37,33 @@ print("Accuracy:", accuracy_score(y_test, y_pred))
 sample_transaction = X_test.iloc[0:1]
 prediction = model.predict(sample_transaction)
 print("Sample transaction prediction (1=Fraud, 0=Legit):", prediction[0])
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+from xgboost import XGBRegressor
+from sklearn.metrics import mean_squared_error
+
+# Load and preprocess data
+df = pd.read_csv('air_quality_data.csv')
+df.dropna(inplace=True)
+
+X = df.drop(columns=['AQI', 'Date'])  # Features
+y = df['AQI']  # Target
+
+# Split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Random Forest
+rf = RandomForestRegressor(n_estimators=100)
+rf.fit(X_train, y_train)
+rf_preds = rf.predict(X_test)
+
+# XGBoost
+xgb = XGBRegressor(n_estimators=100)
+xgb.fit(X_train, y_train)
+xgb_preds = xgb.predict(X_test)
+
+# Evaluate
+print("RF MSE:", mean_squared_error(y_test, rf_preds))
+print("XGB MSE:", mean_squared_error(y_test, xgb_preds))
